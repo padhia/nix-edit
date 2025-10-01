@@ -9,6 +9,7 @@
   lsp.servers = {
     pyright.enable = true;
     metals.enable = true;
+    ansiblels.enable = false;
   };
 
   globals = {
