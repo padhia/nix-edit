@@ -10,6 +10,7 @@
     pyright.enable = true;
     metals.enable = true;
     ansiblels.enable = false;
+    erlang.enable = false;
   };
 
   globals = {
