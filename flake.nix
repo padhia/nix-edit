@@ -8,7 +8,6 @@
     nixvim.url      = "github:nix-community/nixvim";
 
     vscode-ext.inputs.nixpkgs.follows     = "nixpkgs";
-    vscode-ext.inputs.flake-utils.follows = "flake-utils";
     nixvim.inputs.nixpkgs.follows         = "nixpkgs";
   };
 

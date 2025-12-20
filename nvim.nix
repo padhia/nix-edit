@@ -5,9 +5,10 @@
   colorschemes.gruvbox.enable = true;
   colorschemes.ayu.enable = true;
   editorconfig.enable = true;
+  withRuby = false;
 
   lsp.servers = {
-    pyright.enable = true;
+    pyrefly.enable = true;
     metals.enable = true;
     ansiblels.enable = false;
     erlang.enable = false;
@@ -19,27 +20,27 @@
   };
 
   opts = {
-    autoindent     = true;
-    background     = "dark";
-    backspace      = "indent,eol,start";
-    backup         = false;
-    clipboard      = "unnamedplus";
-    diffopt        = "filler,context:25,icase,iwhite,vertical";
-    history        = 50;
-    hlsearch       = true;
-    incsearch      = true;
-    laststatus     = 2;
-    list           = true;
-    listchars      = "tab:  ";
-    mouse          = "a";
-    number         = true;
+    autoindent = true;
+    background = "dark";
+    backspace = "indent,eol,start";
+    backup = false;
+    clipboard = "unnamedplus";
+    diffopt = "filler,context:25,icase,iwhite,vertical";
+    history = 50;
+    hlsearch = true;
+    incsearch = true;
+    laststatus = 2;
+    list = true;
+    listchars = "tab:  ";
+    mouse = "a";
+    number = true;
     relativenumber = true;
-    selectmode     = "";
-    splitright     = true;
-    termguicolors  = true;
-    undofile       = true;
-    virtualedit    = "block";
-    wrap           = false;
+    selectmode = "";
+    splitright = true;
+    termguicolors = true;
+    undofile = true;
+    virtualedit = "block";
+    wrap = false;
   };
 
   plugins = {
