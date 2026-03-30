@@ -1,4 +1,8 @@
-{ pkgs, exts }:
+{
+  pkgs,
+  exts,
+  pkgName ? "vscodium",
+}:
 
 let
   mkt = exts.vscode-marketplace;
@@ -11,7 +15,6 @@ let
     editorconfig.editorconfig
     humao.rest-client
     jdinhlife.gruvbox
-    mhutchie.git-graph
     pkief.material-icon-theme
     teabyii.ayu
     streetsidesoftware.code-spell-checker
@@ -26,9 +29,9 @@ let
 
   python-ext = with mkt; [
     charliermarsh.ruff
+    vsx.meta.pyrefly
     ms-python.debugpy
     ms-python.python
-    ms-python.vscode-pylance
     ms-toolsai.jupyter
     ms-toolsai.jupyter-keymap
     ms-toolsai.jupyter-renderers
@@ -38,8 +41,6 @@ let
 
   misc-ext = with mkt; [
     luggage66.awk
-    vsx.dhall.dhall-lang
-    vsx.dhall.vscode-dhall-lsp-server
     sclu1034.justfile
     vsx.tamasfe.even-better-toml
     tweag.vscode-nickel
@@ -57,7 +58,7 @@ let
     ms-vscode.remote-server
   ];
 in
-  pkgs.vscode-with-extensions.override {
-    vscode = pkgs.vscodium;
-    vscodeExtensions = base-ext ++ scala-ext ++ python-ext ++ misc-ext ++ remote-ext;
+pkgs.vscode-with-extensions.override {
+  vscode = pkgs.${pkgName};
+  vscodeExtensions = base-ext ++ scala-ext ++ python-ext ++ misc-ext ++ remote-ext;
 }
