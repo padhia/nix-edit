@@ -1,19 +1,19 @@
 {
   pkgs,
-  exts,
+  lib,
   pkgName ? "vscodium",
 }:
 
 let
-  mkt = exts.vscode-marketplace;
-  vsx = exts.open-vsx;
+  mkt = pkgs.nix-vscode-extensions.vscode-marketplace;
+  vsx = pkgs.nix-vscode-extensions.open-vsx;
 
-  base-ext = with mkt; [
+  base-ext = with vsx; [
     bierner.markdown-mermaid
-    coenraads.disableligatures
+    mkt.coenraads.disableligatures
     darkriszty.markdown-table-prettify
+    davidanson.vscode-markdownlint
     editorconfig.editorconfig
-    humao.rest-client
     jdinhlife.gruvbox
     pkief.material-icon-theme
     teabyii.ayu
@@ -27,38 +27,48 @@ let
     mkt.disneystreaming.smithy
   ];
 
-  python-ext = with mkt; [
-    charliermarsh.ruff
+  python-ext = [
+    vsx.charliermarsh.ruff
     vsx.meta.pyrefly
-    ms-python.debugpy
-    ms-python.python
-    ms-toolsai.jupyter
-    ms-toolsai.jupyter-keymap
-    ms-toolsai.jupyter-renderers
-    ms-toolsai.vscode-jupyter-cell-tags
-    ms-toolsai.vscode-jupyter-slideshow
+    mkt.ms-python.debugpy
+    mkt.ms-python.python
   ];
 
-  misc-ext = with mkt; [
-    luggage66.awk
-    sclu1034.justfile
-    vsx.tamasfe.even-better-toml
-    tweag.vscode-nickel
-    vsx.snowflake.snowflake-vsc
-    vsx.redhat.vscode-yaml
+  jupyter-ext = with mkt.ms-toolsai; [
+    jupyter
+    jupyter-keymap
+    jupyter-renderers
+    vscode-jupyter-cell-tags
+    vscode-jupyter-slideshow
+  ];
+
+  misc-ext = with vsx; [
+    mkt.luggage66.awk
+    mkt.sclu1034.justfile
+    mkt.tweag.vscode-nickel
+    tamasfe.even-better-toml
+    snowflake.snowflake-vsc
+    redhat.vscode-yaml
+    bbenoist.nix
+    jnoortheen.nix-ide
+    humao.rest-client
   ];
 
   remote-ext = with mkt; [
-    ms-vscode-remote.remote-containers
     ms-vscode-remote.remote-ssh
-    ms-vscode-remote.remote-ssh-edit
-    ms-vscode-remote.remote-wsl
-    ms-vscode-remote.vscode-remote-extensionpack
+    ms-vscode-remote.remote-containers
     ms-vscode.remote-explorer
     ms-vscode.remote-server
+  ];
+
+  isCode = builtins.elem pkgName [
+    "vscode"
+    "vscode-insiders"
+    "codium"
   ];
 in
 pkgs.vscode-with-extensions.override {
   vscode = pkgs.${pkgName};
-  vscodeExtensions = base-ext ++ scala-ext ++ python-ext ++ misc-ext ++ remote-ext;
+  vscodeExtensions =
+    base-ext ++ scala-ext ++ python-ext ++ jupyter-ext ++ misc-ext ++ lib.optionals isCode remote-ext;
 }

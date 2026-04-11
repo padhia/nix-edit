@@ -4,10 +4,10 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    vscode-ext.url = "github:nix-community/nix-vscode-extensions";
+    nix-vscode-ext.url = "github:nix-community/nix-vscode-extensions";
     nixvim.url = "github:nix-community/nixvim";
 
-    vscode-ext.inputs.nixpkgs.follows = "nixpkgs";
+    nix-vscode-ext.inputs.nixpkgs.follows = "nixpkgs";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
   };
 
@@ -15,32 +15,33 @@
     {
       nixpkgs,
       flake-utils,
-      vscode-ext,
+      nix-vscode-ext,
       nixvim,
       ...
     }:
     let
+      inherit (nixpkgs.lib) composeManyExtensions;
+
       overlays.default =
-        final: prev:
         let
-          pkgs = final;
-          exts = vscode-ext.extensions.${final.stdenv.system};
+          my-pkgs =
+            final: prev:
+            let
+              pkgs = final;
+            in
+            {
+              my-codium = pkgs.callPackage ./code.nix { pkgName = "vscodium"; };
+              my-vscode = pkgs.callPackage ./code.nix { pkgName = "vscode"; };
+              my-cursor = pkgs.callPackage ./code.nix { pkgName = "code-cursor"; };
+              my-antigravity = pkgs.callPackage ./code.nix { pkgName = "antigravity"; };
+              my-nvim = nixvim.legacyPackages."${final.stdenv.system}".makeNixvim ./nvim.nix;
+              my-helix-config = pkgs.callPackage ./helix-config.nix { };
+            };
         in
-        {
-          my-code = import ./code.nix {
-            inherit pkgs exts;
-            pkgName = "vscodium";
-          };
-          my-cursor = import ./code.nix {
-            inherit pkgs exts;
-            pkgName = "code-cursor";
-          };
-          my-antigravity = import ./code.nix {
-            inherit pkgs exts;
-            pkgName = "antigravity";
-          };
-          my-nvim = nixvim.legacyPackages."${final.stdenv.system}".makeNixvim ./nvim.nix;
-        };
+        composeManyExtensions [
+          nix-vscode-ext.overlays.default
+          my-pkgs
+        ];
 
       eachSystem =
         system:
@@ -51,52 +52,33 @@
             config.allowUnfree = true;
           };
 
-          inherit (pkgs.lib) getExe;
-
-          packages = {
+          packages = rec {
             inherit (pkgs)
-              my-code
+              my-codium
+              my-vscode
               my-cursor
               my-antigravity
               my-nvim
+              my-helix-config
               ;
-          };
-
-          apps = rec {
-            code = {
-              type = "app";
-              program = getExe packages.my-code;
-            };
-            cursor = {
-              type = "app";
-              program = getExe packages.my-cursor;
-            };
-            antigravity = {
-              type = "app";
-              program = getExe packages.my-antigravity;
-            };
-            nvim = {
-              type = "app";
-              program = getExe packages.my-nvim;
-            };
-            default = code;
+            default = my-codium;
           };
 
           devShells.default = pkgs.mkShell {
-            name = "vscode";
+            name = "codium";
             buildInputs = [ packages.default ];
             shellHook = ''
-              printf "VSCodium with extensions:\n"
+              printf "Codium with extensions:\n"
               codium --list-extensions
             '';
           };
         in
         {
-          inherit packages apps devShells;
+          inherit packages devShells;
         };
     in
     {
       inherit overlays;
-      inherit (flake-utils.lib.eachDefaultSystem eachSystem) devShells packages apps;
+      inherit (flake-utils.lib.eachDefaultSystem eachSystem) devShells packages;
     };
 }

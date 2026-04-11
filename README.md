@@ -6,5 +6,7 @@ Invoke one of the editors with my preferred settings:
 
 Editor:
 
-1. `code`: VS Codium
+1. `code`: VS Codium, and following vaiants
+  - `cursor`
+  - `antigravity`
 1. `nvim`: Neovim
