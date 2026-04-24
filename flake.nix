@@ -6,9 +6,11 @@
     flake-utils.url = "github:numtide/flake-utils";
     nix-vscode-ext.url = "github:nix-community/nix-vscode-extensions";
     nixvim.url = "github:nix-community/nixvim";
+    wrappers.url = "github:lassulus/wrappers";
 
     nix-vscode-ext.inputs.nixpkgs.follows = "nixpkgs";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
+    wrappers.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -17,6 +19,7 @@
       flake-utils,
       nix-vscode-ext,
       nixvim,
+      wrappers,
       ...
     }:
     let
@@ -24,23 +27,21 @@
 
       overlays.default =
         let
-          my-pkgs =
-            final: prev:
-            let
+          my-overlay = final: prev: {
+            my-codium = final.callPackage ./code.nix { pkgName = "vscodium"; };
+            my-vscode = final.callPackage ./code.nix { pkgName = "vscode"; };
+            my-cursor = final.callPackage ./code.nix { pkgName = "code-cursor"; };
+            my-antigravity = final.callPackage ./code.nix { pkgName = "antigravity"; };
+            my-nvim = nixvim.legacyPackages."${final.stdenv.system}".makeNixvim ./nvim.nix;
+            my-helix = import ./helix {
+              inherit wrappers;
               pkgs = final;
-            in
-            {
-              my-codium = pkgs.callPackage ./code.nix { pkgName = "vscodium"; };
-              my-vscode = pkgs.callPackage ./code.nix { pkgName = "vscode"; };
-              my-cursor = pkgs.callPackage ./code.nix { pkgName = "code-cursor"; };
-              my-antigravity = pkgs.callPackage ./code.nix { pkgName = "antigravity"; };
-              my-nvim = nixvim.legacyPackages."${final.stdenv.system}".makeNixvim ./nvim.nix;
-              my-helix-config = pkgs.callPackage ./helix-config.nix { };
             };
+          };
         in
         composeManyExtensions [
           nix-vscode-ext.overlays.default
-          my-pkgs
+          my-overlay
         ];
 
       eachSystem =
@@ -59,9 +60,9 @@
               my-cursor
               my-antigravity
               my-nvim
-              my-helix-config
+              my-helix
               ;
-            default = my-codium;
+            default = my-helix;
           };
 
           devShells.default = pkgs.mkShell {
