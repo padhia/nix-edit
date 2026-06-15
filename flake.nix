@@ -9,7 +9,8 @@
     wrappers.url = "github:lassulus/wrappers";
 
     nix-vscode-ext.inputs.nixpkgs.follows = "nixpkgs";
-    nixvim.inputs.nixpkgs.follows = "nixpkgs";
+    # https://github.com/nix-community/nixvim/issues/4023#issuecomment-3607875748
+    # nixvim.inputs.nixpkgs.follows = "nixpkgs";
     wrappers.inputs.nixpkgs.follows = "nixpkgs";
   };
 
@@ -32,11 +33,18 @@
             my-vscode = final.callPackage ./code.nix { pkgName = "vscode"; };
             my-cursor = final.callPackage ./code.nix { pkgName = "code-cursor"; };
             my-antigravity = final.callPackage ./code.nix { pkgName = "antigravity"; };
-            my-nvim = nixvim.legacyPackages."${final.stdenv.system}".makeNixvim ./nvim.nix;
             my-helix = import ./helix {
               inherit wrappers;
               pkgs = final;
             };
+            my-nvim =
+              let
+                conf = nixvim.lib.evalNixvim {
+                  inherit (final.stdenv) system;
+                  modules = [ ./nvim.nix ];
+                };
+              in
+              conf.config.build.package;
           };
         in
         composeManyExtensions [
