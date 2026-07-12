@@ -32,7 +32,7 @@
             my-codium = final.callPackage ./code.nix { pkgName = "vscodium"; };
             my-vscode = final.callPackage ./code.nix { pkgName = "vscode"; };
             my-cursor = final.callPackage ./code.nix { pkgName = "code-cursor"; };
-            my-antigravity = final.callPackage ./code.nix { pkgName = "antigravity"; };
+            my-antigravity = final.callPackage ./code.nix { pkgName = "antigravity-ide"; };
             my-helix = import ./helix {
               inherit wrappers;
               pkgs = final;
