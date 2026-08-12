@@ -64,10 +64,25 @@ let
     };
     language-servers = [ "metals" ];
   };
+
+  pkl = {
+    name = "pkl";
+    file-types = [ "pkl" ];
+    comment-token = "//";
+    scope = "source.pkl";
+    language-servers = [ "pkl-lsp" ];
+    indent = {
+      tab-width = 2;
+      unit = "  ";
+    };
+    formatter.command = "pkl-formatter";
+    auto-format = true;
+  };
 in
 [
   python
   nix
   sql
   scala
+  pkl
 ]
