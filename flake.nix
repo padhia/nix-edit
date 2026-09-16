@@ -1,12 +1,18 @@
 {
   description = "VSCodium with extensions";
 
+  nixConfig = {
+    extra-substituters = [ "https://helix.cachix.org" ];
+    extra-trusted-public-keys = [ "helix.cachix.org-1:ejp9KQpR1FBI2onstMQ34yogDm4OgU2ru6lIwPvuCVs=" ];
+  };
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     nix-vscode-ext.url = "github:nix-community/nix-vscode-extensions";
     nixvim.url = "github:nix-community/nixvim";
     wrappers.url = "github:lassulus/wrappers";
+    helix.url = "github:helix-editor/helix";
 
     nix-vscode-ext.inputs.nixpkgs.follows = "nixpkgs";
     # https://github.com/nix-community/nixvim/issues/4023#issuecomment-3607875748
@@ -21,6 +27,7 @@
       nix-vscode-ext,
       nixvim,
       wrappers,
+      helix,
       ...
     }:
     let
@@ -28,6 +35,10 @@
 
       overlays.default =
         let
+          helix-overlay = final: prev: {
+            helix = helix.packages.${prev.stdenv.hostPlatform.system}.default;
+          };
+
           my-overlay = final: prev: {
             my-codium = final.callPackage ./code.nix { pkgName = "vscodium"; };
             my-vscode = final.callPackage ./code.nix { pkgName = "vscode"; };
@@ -48,6 +59,7 @@
           };
         in
         composeManyExtensions [
+          helix-overlay
           nix-vscode-ext.overlays.default
           my-overlay
         ];
