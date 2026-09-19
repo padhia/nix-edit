@@ -1,33 +1,26 @@
 {
-  description = "VSCodium with extensions";
-
-  nixConfig = {
-    extra-substituters = [ "https://helix.cachix.org" ];
-    extra-trusted-public-keys = [ "helix.cachix.org-1:ejp9KQpR1FBI2onstMQ34yogDm4OgU2ru6lIwPvuCVs=" ];
-  };
+  description = "My preferred editors";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     nix-vscode-ext.url = "github:nix-community/nix-vscode-extensions";
-    nixvim.url = "github:nix-community/nixvim";
+    nvf.url = "github:notashelf/nvf";
     wrappers.url = "github:lassulus/wrappers";
-    helix.url = "github:helix-editor/helix";
 
     nix-vscode-ext.inputs.nixpkgs.follows = "nixpkgs";
-    # https://github.com/nix-community/nixvim/issues/4023#issuecomment-3607875748
-    # nixvim.inputs.nixpkgs.follows = "nixpkgs";
+    nvf.inputs.nixpkgs.follows = "nixpkgs";
     wrappers.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
     {
+      self,
       nixpkgs,
       flake-utils,
       nix-vscode-ext,
-      nixvim,
       wrappers,
-      helix,
+      nvf,
       ...
     }:
     let
@@ -35,10 +28,6 @@
 
       overlays.default =
         let
-          helix-overlay = final: prev: {
-            helix = helix.packages.${prev.stdenv.hostPlatform.system}.default;
-          };
-
           my-overlay = final: prev: {
             my-codium = final.callPackage ./code.nix { pkgName = "vscodium"; };
             my-vscode = final.callPackage ./code.nix { pkgName = "vscode"; };
@@ -50,16 +39,15 @@
             };
             my-nvim =
               let
-                conf = nixvim.lib.evalNixvim {
-                  inherit (final.stdenv) system;
+                conf = nvf.lib.neovimConfiguration {
+                  inherit (final) pkgs;
                   modules = [ ./nvim.nix ];
                 };
               in
-              conf.config.build.package;
+              conf.neovim;
           };
         in
         composeManyExtensions [
-          helix-overlay
           nix-vscode-ext.overlays.default
           my-overlay
         ];
