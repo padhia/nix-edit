@@ -1,61 +1,66 @@
-{
-  viAlias = true;
-  vimAlias = true;
+{ pkgs, ... }: {
+  vim.viAlias = true;
+  vim.vimAlias = true;
 
-  colorschemes.gruvbox.enable = true;
-  colorschemes.ayu.enable = true;
-  editorconfig.enable = true;
-  withRuby = false;
+  vim.autocomplete.blink-cmp.enable = true;
+  vim.autopairs.nvim-autopairs.enable = true;
+  vim.binds.whichKey.enable = true;
+  vim.comments.comment-nvim.enable = true;
+  vim.filetree.neo-tree.enable = true;
+  vim.git.enable = true;
+  vim.git.gitsigns.codeActions.enable = true;
+  vim.git.gitsigns.enable = true;
+  vim.lsp.enable = true;
+  vim.lsp.formatOnSave = true;
+  vim.statusline.lualine.enable = true;
+  vim.statusline.lualine.integrations.breadcrumbs.nvim-navic.enable = true;
+  vim.telescope.enable = true;
+  vim.utility.surround.enable = true;
+  vim.visuals.indent-blankline.enable = true;
+  vim.visuals.rainbow-delimiters.enable = true;
 
-  lsp.servers = {
-    pyrefly.enable = true;
-    metals.enable = true;
-    ansiblels.enable = false;
-    erlang.enable = false;
+  vim.extraPlugins.ayu-vim.package = pkgs.vimPlugins.ayu-vim;
+
+  vim.theme = {
+    enable = true;
+    name = "gruvbox";
+    style = "dark";
+    transparent = false;
   };
 
-  globals = {
-    mapleader = " ";
-    maplocalleader = " ";
+  vim.languages = {
+    enableTreesitter = true;
+    enableFormat = true;
+
+    scala.enable = true;
+
+    nix = {
+      enable = true;
+      lsp.enable = true;
+      lsp.servers = [ "nixd" ];
+      format.enable = true;
+      format.type = [ "nixfmt" ];
+    };
+
+    python = {
+      enable = true;
+      lsp.enable = true;
+      lsp.servers = [ "pyrefly" ];
+      format.enable = true;
+      format.type = [ "ruff" ];
+    };
+
+    sql = {
+      enable = true;
+      treesitter.enable = true;
+      lsp.enable = false;
+      format.enable = false;
+    };
+
+    yaml.enable = true;
+    toml.enable = true;
+    bash.enable = true;
   };
 
-  opts = {
-    autoindent = true;
-    background = "dark";
-    backspace = "indent,eol,start";
-    backup = false;
-    clipboard = "unnamedplus";
-    diffopt = "filler,context:25,icase,iwhite,vertical";
-    history = 50;
-    hlsearch = true;
-    incsearch = true;
-    laststatus = 2;
-    list = true;
-    listchars = "tab:  ";
-    mouse = "a";
-    number = true;
-    relativenumber = true;
-    selectmode = "";
-    splitright = true;
-    termguicolors = true;
-    undofile = true;
-    virtualedit = "block";
-    wrap = false;
-  };
-
-  plugins = {
-    bufferline.enable = true;
-    web-devicons.enable = true;
-    neo-tree.enable = true;
-    gitsigns.enable = true;
-  };
-
-  keymaps = [
-    {
-      mode = "n";
-      key = "<leader>e";
-      action = "<cmd>Neotree toggle<cr>";
-      options.desc = "Toggle Neotree";
-    }
-  ];
+  vim.treesitter.grammars = [ pkgs.vimPlugins.nvim-treesitter-parsers.pkl ];
 }
