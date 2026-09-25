@@ -2,7 +2,7 @@
   vim.viAlias = true;
   vim.vimAlias = true;
 
-  vim.autocomplete.blink-cmp.enable = true;
+  vim.autocomplete.nvim-cmp.enable = true;
   vim.autopairs.nvim-autopairs.enable = true;
   vim.binds.whichKey.enable = true;
   vim.comments.comment-nvim.enable = true;
