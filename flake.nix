@@ -89,5 +89,6 @@
     {
       inherit overlays;
       inherit (flake-utils.lib.eachDefaultSystem eachSystem) devShells packages;
+      vscode-ext-groups = import ./vscode-ext-groups.nix;
     };
 }
