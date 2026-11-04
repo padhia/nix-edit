@@ -45,7 +45,7 @@ let
       ms-python.debugpy
       ms-python.python
     ]
-    ++ lib.optional install-remote remote;
+    ++ lib.optionals install-remote remote;
 
   jupyter-ext = with vsx.ms-toolsai; [
     jupyter
@@ -57,6 +57,7 @@ let
 
   misc-ext = with vsx; [
     mkt.luggage66.awk
+    kcl.kcl-vscode-extension
     nefrob.vscode-just-syntax
     nickel-lang.vscode-nickel
     tamasfe.even-better-toml

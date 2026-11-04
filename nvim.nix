@@ -82,7 +82,48 @@ let
       bash.enable = true;
     };
 
-    treesitter.grammars = [ pkgs.vimPlugins.nvim-treesitter-parsers.pkl ];
+    filetype.extension.k = "kcl";
+
+    lsp.servers = {
+      kcl = {
+        enable = true;
+        cmd = [ (pkgs.lib.getExe pkgs.kcl-language-server) ];
+        filetypes = [ "kcl" ];
+        root_markers = [
+          "kcl.mod"
+          "kcl.yaml"
+          ".git"
+        ];
+      };
+      pkl = {
+        enable = true;
+        cmd = [ (pkgs.lib.getExe pkgs.pkl-lsp) ];
+        filetypes = [
+          "pkl"
+          "pcf"
+        ];
+        root_markers = [
+          "PklProject"
+          ".git"
+        ];
+      };
+    };
+
+    formatter.conform-nvim.setupOpts = {
+      formatters_by_ft = {
+        kcl = [ "kcl" ];
+        pkl = [ "pkl" ];
+      };
+      formatters = {
+        kcl.command = pkgs.lib.getExe pkgs.kcl;
+        pkl.command = pkgs.lib.getExe pkgs.pkl;
+      };
+    };
+
+    treesitter.grammars = with pkgs.vimPlugins.nvim-treesitter-parsers; [
+      pkl
+      kcl
+    ];
   };
 in
 {

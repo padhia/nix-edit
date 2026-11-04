@@ -16,8 +16,14 @@ let
       ];
     };
     language-servers = [
-      "pyrefly"
-      "ruff"
+      {
+        name = "pyrefly";
+        except-features = [ "format" ];
+      }
+      {
+        name = "ruff";
+        only-features = [ "format" ];
+      }
     ];
   };
 
@@ -26,7 +32,7 @@ let
     file-types = [ "nix" ];
     indent = {
       tab-width = 2;
-      unit = " ";
+      unit = "  ";
     };
     formatter = {
       command = getExe pkgs.nixfmt;
@@ -42,7 +48,7 @@ let
     ];
     indent = {
       tab-width = 4;
-      unit = " ";
+      unit = "    ";
     };
   };
 
@@ -78,6 +84,27 @@ let
     formatter.command = "pkl-formatter";
     auto-format = true;
   };
+
+  kcl = {
+    name = "kcl";
+    scope = "source.kcl";
+    file-types = [ "k" ];
+    roots = [
+      "kcl.mod"
+      "kcl.yaml"
+    ];
+    comment-tokens = "#";
+    indent = {
+      tab-width = 4;
+      unit = "    ";
+    };
+    language-servers = [ "kcl-lsp" ];
+    formatter = {
+      command = "kcl-formatter";
+      args = [ ];
+    };
+    auto-format = true;
+  };
 in
 [
   python
@@ -85,4 +112,5 @@ in
   sql
   scala
   pkl
+  kcl
 ]

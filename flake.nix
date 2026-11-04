@@ -7,12 +7,14 @@
     nix-vscode-ext.url = "github:nix-community/nix-vscode-extensions";
     nvf.url = "github:notashelf/nvf";
     wrappers.url = "github:lassulus/wrappers";
-    helix-editor.url = "github:gj1118/helix";
+    helix-editor = {
+      url = "github:gj1118/helix";
+      flake = false;
+    };
 
     nix-vscode-ext.inputs.nixpkgs.follows = "nixpkgs";
     nvf.inputs.nixpkgs.follows = "nixpkgs";
     wrappers.inputs.nixpkgs.follows = "nixpkgs";
-    helix-editor.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -32,6 +34,15 @@
       overlays.default =
         let
           my-overlay = final: prev: {
+            helix-unwrapped = prev.helix-unwrapped.overrideAttrs (old: {
+              src = helix-editor;
+              cargoDeps = final.rustPlatform.importCargoLock {
+                lockFile = "${helix-editor}/Cargo.lock";
+              };
+              passthru = (old.passthru or { }) // {
+                inherit (old) src;
+              };
+            });
             my-codium = final.callPackage ./code.nix { pkgName = "vscodium"; };
             my-vscode = final.callPackage ./code.nix { pkgName = "vscode"; };
             my-cursor = final.callPackage ./code.nix { pkgName = "code-cursor"; };
@@ -51,7 +62,6 @@
           };
         in
         composeManyExtensions [
-          helix-editor.overlays.helix
           nix-vscode-ext.overlays.default
           my-overlay
         ];
@@ -79,7 +89,7 @@
 
           devShells.default = pkgs.mkShell {
             name = "codium";
-            buildInputs = [ packages.default ];
+            buildInputs = [ packages.my-codium ];
             shellHook = ''
               printf "Codium with extensions:\n"
               codium --list-extensions
