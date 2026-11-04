@@ -7,10 +7,12 @@
     nix-vscode-ext.url = "github:nix-community/nix-vscode-extensions";
     nvf.url = "github:notashelf/nvf";
     wrappers.url = "github:lassulus/wrappers";
+    helix-editor.url = "github:gj1118/helix";
 
     nix-vscode-ext.inputs.nixpkgs.follows = "nixpkgs";
     nvf.inputs.nixpkgs.follows = "nixpkgs";
     wrappers.inputs.nixpkgs.follows = "nixpkgs";
+    helix-editor.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -21,6 +23,7 @@
       nix-vscode-ext,
       wrappers,
       nvf,
+      helix-editor,
       ...
     }:
     let
@@ -48,6 +51,7 @@
           };
         in
         composeManyExtensions [
+          helix-editor.overlays.helix
           nix-vscode-ext.overlays.default
           my-overlay
         ];
