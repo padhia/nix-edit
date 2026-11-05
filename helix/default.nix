@@ -2,6 +2,7 @@
 
 let
   kclLSP = pkgs.lib.meta.availableOn pkgs.stdenv.hostPlatform pkgs.kcl-language-server;
+  inherit (pkgs.stdenv.hostPlatform) isDarwin;
 
   languages = {
     language-server = {
@@ -54,7 +55,20 @@ let
       name = "runtime/queries/kcl/highlights.scm";
       file.path = "${kclGrammar.src}/queries/highlights.scm";
     }
-  ];
+  ]
+  # The fork loads .dylib on Darwin, but Nixpkgs still packages .so grammars.
+  ++ pkgs.lib.optionals isDarwin (
+    pkgs.lib.mapAttrsToList (_: grammar: {
+      name = "runtime/grammars/${grammar.language}.dylib";
+      file.path = "${pkgs.helix.runtime}/grammars/${grammar.language}.so";
+    }) (pkgs.lib.filterAttrs (_: grammar: grammar.language != "kcl") pkgs.helix.tree-sitter-grammars)
+    ++ [
+      {
+        name = "runtime/grammars/kcl.dylib";
+        file.path = "${kclGrammar}/parser";
+      }
+    ]
+  );
 
   package =
     (wrappers.wrapperModules.helix.apply {
