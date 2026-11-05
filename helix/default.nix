@@ -1,6 +1,8 @@
 { pkgs, wrappers }:
 
 let
+  kclLSP = pkgs.lib.meta.availableOn pkgs.stdenv.hostPlatform pkgs.kcl-language-server;
+
   languages = {
     language-server = {
       pyrefly = {
@@ -11,12 +13,15 @@ let
         command = "ruff";
         args = [ "server" ];
       };
+    }
+    // pkgs.lib.optionalAttrs kclLSP {
       kcl-lsp = {
         command = "kcl-language-server";
         args = [ ];
       };
     };
-    language = import ./language.nix { inherit pkgs; };
+
+    language = import ./language.nix { inherit pkgs kclLSP; };
   };
 
   settings = {
@@ -88,9 +93,9 @@ pkgs.symlinkJoin {
     pkgs.pkl-lsp
     pkl-formatter
     pkgs.kcl
-    pkgs.kcl-language-server
     kcl-formatter
-  ];
+  ]
+  ++ pkgs.lib.optional kclLSP pkgs.kcl-language-server;
 
   inherit (pkgs.helix) meta;
 

@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, kclLSP }:
 let
   inherit (pkgs.lib) getExe;
   python = {
@@ -98,7 +98,7 @@ let
       tab-width = 4;
       unit = "    ";
     };
-    language-servers = [ "kcl-lsp" ];
+    language-servers = pkgs.lib.optional kclLSP "kcl-lsp";
     formatter = {
       command = "kcl-formatter";
       args = [ ];

@@ -1,5 +1,7 @@
 { pkgs, ... }:
 let
+  kclLSP = pkgs.lib.meta.availableOn pkgs.stdenv.hostPlatform pkgs.kcl-language-server;
+
   vim = {
     viAlias = true;
     vimAlias = true;
@@ -85,16 +87,6 @@ let
     filetype.extension.k = "kcl";
 
     lsp.servers = {
-      kcl = {
-        enable = true;
-        cmd = [ (pkgs.lib.getExe pkgs.kcl-language-server) ];
-        filetypes = [ "kcl" ];
-        root_markers = [
-          "kcl.mod"
-          "kcl.yaml"
-          ".git"
-        ];
-      };
       pkl = {
         enable = true;
         cmd = [ (pkgs.lib.getExe pkgs.pkl-lsp) ];
@@ -104,6 +96,18 @@ let
         ];
         root_markers = [
           "PklProject"
+          ".git"
+        ];
+      };
+    }
+    // pkgs.lib.optionalAttrs kclLSP {
+      kcl = {
+        enable = true;
+        cmd = [ (pkgs.lib.getExe pkgs.kcl-language-server) ];
+        filetypes = [ "kcl" ];
+        root_markers = [
+          "kcl.mod"
+          "kcl.yaml"
           ".git"
         ];
       };
